@@ -34,6 +34,10 @@ export default function() {
     return schema.projects.find(request.params.id) || schema.projects.find(1);
   });
 
+  this.post('/projects/feedback', function() {
+    return { status: 'success' };
+  });
+
   /*
     Config (with defaults).
 

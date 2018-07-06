@@ -2,8 +2,8 @@ import Component from '@ember/component';
 import { action } from '@ember-decorators/object';
 import { argument } from '@ember-decorators/argument';
 import { run } from '@ember/runloop';
+import fetch from 'fetch';
 import ENV from 'labs-zap-search/config/environment';
-
 
 export default class ProjectFeedbackComponent extends Component {
   @argument
@@ -13,7 +13,6 @@ export default class ProjectFeedbackComponent extends Component {
   flagClosed = true;
   flagSuccess = false;
   reCaptchaResponse = null;
-
 
   @action
   handleFlagOpen() {
@@ -31,15 +30,14 @@ export default class ProjectFeedbackComponent extends Component {
     this.set('reCaptchaResponse', reCaptchaResponse);
   }
 
-
   @action
-  submitFlag() {
+  async submitFlag() {
     const projectname = this.get('project.dcp_projectname');
     const projectid = this.get('project.dcp_name');
     const flagText = this.get('flagText');
     const reCaptchaResponse = this.get('reCaptchaResponse');
 
-    fetch(`${ENV.host}/projects/feedback`, {
+    const { status } = await fetch(`${ENV.host}/projects/feedback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,17 +48,20 @@ export default class ProjectFeedbackComponent extends Component {
         text: flagText,
         'g-recaptcha-response': reCaptchaResponse,
       }),
-    })
-      .then(res => res.json())
-      .then(({status}) => {
-          if (status === 'success') {
-            this.set('flagSuccess', true);
-            run.later(() => {
-              this.set('flagSuccess', false);
-              this.set('flagText', '');
-              this.set('flagClosed', true);
-            }, 2000);
-          }
-      });
+    }).then(res => res.json());
+
+    if (status === 'success' && !this.get('isDestroyed')) {
+      this.set('flagSuccess', true);
+      run.later(() => {
+        if (!this.get('isDestroyed')) {
+          this.setProperties({
+            flagSuccess: false,
+            flagText: '',
+            flagClosed: true,
+            reCaptchaResponse: null,
+          });
+        }
+      }, 2000);
+    }
   }
 }
