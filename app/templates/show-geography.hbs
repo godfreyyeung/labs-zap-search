@@ -15,6 +15,9 @@
       mutateArray=(action 'mutateArray')
       as |section|
     }}
+      {{#block-slot 'title'}}
+        {{icon-tooltip tip='test'}}
+      {{/block-slot}}
       {{slider-filter
         start=dcp_certifiedreferred
         min=(object-at 0 queryParamsState.dcp_certifiedreferred.defaultValue)

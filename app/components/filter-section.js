@@ -1,8 +1,11 @@
 import Component from '@ember/component';
+import SlotsMixin from 'ember-block-slots'
 import { computed, action } from '@ember-decorators/object';
 import { classNames, className } from '@ember-decorators/component';
 import { argument } from '@ember-decorators/argument';
 import { contains } from 'ember-composable-helpers/helpers/contains';
+
+const SlottableComponent = Component.extend(SlotsMixin);
 
 const filterLookup = {
   'Project Name / Description / Applicant': {
@@ -35,11 +38,10 @@ const filterLookup = {
       'ULURP': {
     tooltipvalue: 'Applications can either follow the Uniform Land Use Review Procedure (ULURP) or are designated as Non-ULURP, and are therefore not restricted to ULURP rules and timing.',
   }
-}
-
+};
 
 @classNames('filter')
-export default class FilterSectionComponent extends Component {
+export default class FilterSectionComponent extends SlottableComponent {
   @argument
   filterTitle = '';
 
