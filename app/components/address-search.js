@@ -53,7 +53,7 @@ export default class AddressSearch extends Component {
   @action
   selectSearchResult(result) {
     this.set('geocodedGeometry', result.geometry);
-
+    // Starfruit: how did this change after we shifted over to the new radius layer?
     // notify that a search result has been selected
     this.onSelectSearchResult(result);
   }

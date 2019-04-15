@@ -98,7 +98,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'devlocal') {
-    ENV.host = 'http://localhost:3000';
+    ENV.host = 'http://localhost:3500';
     ENV['mapbox-gl'].map.style = '/test-data/style.json';
     ENV['ember-cli-mirage'] = {
       enabled: false,

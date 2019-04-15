@@ -91,6 +91,7 @@ export default class ProjectListMapComponent extends Component {
     return this.tiles.map(url => `${url}?type=${this.tileMode}`);
   }
 
+
   @action
   computeTileMode(e) {
     if (e.target.getZoom() > expandToPolygonZoomThreshold) {
