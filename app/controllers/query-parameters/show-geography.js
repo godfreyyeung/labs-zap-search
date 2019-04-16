@@ -99,7 +99,7 @@ export const projectParams = new QueryParams({
     },
   },
   distance_from_point: {
-    defaultValue: [-73.9868, 40.724], // Starfruit: why do we need a default value here? If a user clicks a new point before the default is loaded, the map still zooms to the default
+    defaultValue: [0, 0], // Starfruit: why do we need a default value here? If a user clicks a new point before the default is loaded, the map still zooms to the default
     refresh: true, // Starfruit: old points are still persisting, how do we assure this doesn't happen?
     serialize(value) {
       return value.toString();

@@ -36,6 +36,8 @@ export default class FilterDistanceFromPoint extends Component {
   // queries relevant layer for intersecting feature and sends it
   // to the click action. conditionally allows for clicking
   // anywhere on the map
+
+  // this has nothing to do with SEARCH
   @action
   handleClick(e) {
     const { target: map } = e; // map
@@ -43,18 +45,23 @@ export default class FilterDistanceFromPoint extends Component {
     // e --> lngLat, originalEvent: MouseEvent, point, target, type: "click"
     console.log('point peach', point);
     const [feature] = map.queryRenderedFeatures( // returns array of GeoJSON feature objects representing visible features that satisfy the query parameters
-      point,
-      { layers: [this.pointLayerId] },
+      point, // query rendered features at this coordinate
+      { layers: [this.pointLayerId] }, // project-centroids-circle
     );
 
+    // if point exists
     if (feature) {
-      const { geometry: { coordinates } } = feature;
+      const { geometry: { coordinates } } = feature; // feature.geometry.coordinates
       console.log('coordinates peach', coordinates); // Starfruit: confused about when this shows up, only sometimes?
-      console.log('feature peach', feature); // confused about when this shows up, only sometimes?
+      console.log('feature peach 2', feature); // confused about when this shows up, only sometimes?
+      const heyaaa = this.onRadiusFilterClick(coordinates);
+      console.log('onRadius peachy', heyaaa);
+      console.log('heyyy');
 
       this.onRadiusFilterClick(coordinates);
     } else if (this.shouldQueryFullMap) {
-      const { lng, lat } = map.unproject(point);
+      const { lng, lat } = map.unproject(point); // turn back into lat/lng
+      console.log('hooo');
 
       this.onRadiusFilterClick([lng, lat]);
     }
