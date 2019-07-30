@@ -4,8 +4,7 @@ const { Model } = DS;
 
 export default class RecommendationModel extends Model {
 
-// submittedBy? Can we assume a user is the submitter?
-// can we assume this is singular?
+// representing --> userProjectRole
 // affiliationType from user?--assuming user has same affiliation across projects
 //...but what is affiliation is project specific?
 @belongsTo('user') user;

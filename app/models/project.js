@@ -19,6 +19,7 @@ export default class ProjectModel extends Model {
   // can we replace this array/string of action codes with action model?
   @hasMany('action') actions;
   @hasMany('user') users;
+  @hasMany('userProjectRole') userProjectsRoles;
 
   @attr() applicantteam;
 
@@ -67,9 +68,6 @@ export default class ProjectModel extends Model {
 
   // do we need a milestones model?
   @attr() milestones;
-
-  // array of action codes?
-  // @attr() actions;
 
   @attr() addresses;
 

@@ -12,6 +12,8 @@ export default class ActionModel extends Model {
 // dcp_ActionType--> actionType (what does this mean?)
 // action code? 
 // unique id? dcp_actionid --> actionId
+// LIST OUT ATTRIBUTES IN COMMENT (OBJECT IN PROJECT MODEL--ACTIONS)
+// LOOKUP OF UNIQUE IDS
 @belongsTo('project') project;
 @belongsTo('hearing') hearing;
 @hasMany('recommendation') recommendations;
