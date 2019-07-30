@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import { attr } from '@ember-decorators/data';
+import { attr, hasMany } from '@ember-decorators/data';
 import { computed } from '@ember-decorators/object';
 
 const { Model } = DS;
@@ -16,6 +16,10 @@ const EmptyFeatureCollection = {
 };
 
 export default class ProjectModel extends Model {
+  // can we replace this array/string of action codes with action model?
+  @hasMany('action') actions;
+  @hasMany('user') users;
+
   @attr() applicantteam;
 
   // array of applicant objects
@@ -91,7 +95,8 @@ export default class ProjectModel extends Model {
 
   @attr() milestones;
 
-  @attr() actions;
+  // array of action codes?
+  // @attr() actions;
 
   @attr() addresses;
 
