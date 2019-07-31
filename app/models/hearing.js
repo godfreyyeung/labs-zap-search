@@ -1,15 +1,14 @@
 import DS from 'ember-data';
-const { Model } = DS;
 import { attr, belongsTo } from '@ember-decorators/data';
 
+const { Model } = DS;
+
 export default class HearingModel extends Model {
+  @belongsTo('action') action;
 
-@belongsTo('action') action;
+  @attr('boolean') isScheduled;
 
-@attr('boolean') isScheduled;
+  @attr('string', { defaultValue: '' }) location;
 
-@attr('string', { defaultValue: '' }) location;
-
-@attr('date') date;
-
+  @attr('date') date;
 }

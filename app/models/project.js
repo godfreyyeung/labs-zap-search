@@ -18,8 +18,10 @@ const EmptyFeatureCollection = {
 export default class ProjectModel extends Model {
   // can we replace this array/string of action codes with action model?
   @hasMany('action') actions;
+
   @hasMany('user') users;
-  @hasMany('userProjectRole') userProjectsRoles;
+
+  @hasMany('userProjectParticipation') userProjectParticipants;
 
   @attr() applicantteam;
 
@@ -65,6 +67,11 @@ export default class ProjectModel extends Model {
   @attr('boolean') has_centroid;
 
   @attr() bbls;
+
+  // do we need a milestones model?
+
+  @attr({ defaultValue: () => EmptyFeatureCollection })
+  bbl_featurecollection
 
   // do we need a milestones model?
   @attr() milestones;
