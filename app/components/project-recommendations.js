@@ -17,9 +17,10 @@ export default class ProjectRecommendationsComponent extends Component {
   @computed('user', 'project')
   get userProjectParticipantTypes() {
     if (this.user && this.project) {
-      const userProjectParticipantTypes = this.user.get('userProjectParticipantTypes').filterBy('project.id', this.project.get('id'));
-      return userProjectParticipantTypes.map(value => value.get('participantType'));
-    }
+      let filteredPartTypes = this.user.get('userProjectParticipantTypes').filterBy('project.id', this.project.get('id'));
+      let partTypesList = filteredPartTypes.map(value => value.get('participantType'));
+      return partTypesList;
+    };
     return [];
   }
 
