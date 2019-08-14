@@ -14,9 +14,9 @@ export default class CurrentUserService extends Service {
   @computed('session.{isAuthenticated,data.authenticated}')
   get user() {
     // TODO: query by email (this.session.data.authenticated.email)
-    return this.store.findRecord('user', 2, {
+    return this.store.findRecord('user', 1, {
       reload: true,
-      include: 'userProjectParticipantTypes.project,projects',
+      include: 'userProjectParticipantTypes.project,projects.actions',
     });
   }
 

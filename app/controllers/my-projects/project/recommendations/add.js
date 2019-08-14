@@ -23,7 +23,13 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   @service
   store;
 
+  @service
+  currentUser;
+
   // the project is available through the model.
+
+  // the participant-type-dependent Recommendation is set up within the router's
+  // setupController.
 
   // if the new recommendation applies to all actions
   allActions = true;

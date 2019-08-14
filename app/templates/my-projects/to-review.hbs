@@ -19,31 +19,34 @@
         </div>
       </div>
       <div class="cell large-auto">
-        <a class="button expanded no-margin">Add Your<br>Hearing&nbsp;Date</a>
-        {{#project-recommendations
+        <a class="button expanded no-margin">
+          Add Your<br>Hearing&nbsp;Date
+        </a>
+        {{#participant-types
           project=project
           user=(await this.currentUser.user)
-          as |projectRecommendations|
+          as |partTypes|
         }}
-          {{#each projectRecommendations.list as |projectRecommendation|}}
+          {{#each partTypes as |participantType|}}
             <LinkTo @route="my-projects.project.recommendations.add"
-              @model={{projectRecommendation}}
+              @model={{project}}
+              @query={{hash participantType=participantType}}
               class="button expanded no-margin"
             >
               Submit&nbsp;Your<br>
               <b>
-              {{#if (eq projectRecommendation.constructor.modelName "borough-president-recommendation")}}
+              {{#if (eq participantType "BP")}}
                 Borough&nbsp;President
-              {{else if (eq projectRecommendation.constructor.modelName "borough-board-recommendation")}}
+              {{else if (eq participantType "BB")}}
                 Borough&nbsp;Board
-              {{else if (eq projectRecommendation.constructor.modelName "community-board-recommendation")}}
+              {{else if (eq participantType "CB")}}
                 Community&nbsp;Board
               {{/if}}
               </b>
               Recommendation
             </LinkTo>
           {{/each}}
-        {{/project-recommendations}}
+        {{/participant-types}}
       </div>
     </div>
   </div>
