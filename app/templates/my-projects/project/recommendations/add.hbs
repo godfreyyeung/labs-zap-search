@@ -45,106 +45,110 @@
         </h4>
         <fieldset class="fieldset">
           <legend>Choose if a Quorum was present:</legend>
-          {{input type="radio" name="quorum-yes" id="quorum-yes"
-            onChange=(action 'mutateArray' 'boroughs' type)
-          }}
-          <label for="quorum-yes">Yes</label>
-          <input type="radio" name="quorum-no" id="quorum-no" value="false"><label for="quorum-no">No</label>
+          <input type="radio"
+            name="quorum-yes"
+            id="quorum-yes"
+            checked={{if this.recommendation.didQuorumExist "checked"}}
+            onClick={{action "updateRecAttr" "didQuorumExist" true}}
+          />
+          <label for="quorum-yes">
+            Yes
+          </label>
+          <input type="radio"
+            name="quorum-no"
+            id="quorum-no"
+            checked={{if (not this.recommendation.didQuorumExist) "checked"}}
+            onClick={{action "updateRecAttr" "didQuorumExist" false}}
+          />
+          <label for="quorum-no">
+            No
+          </label>
         </fieldset>
       </div>
     {{/if}}
     <div class="project-summary-card callout">
       <h4>When &amp; where was your vote held?</h4>
-      Date: {{input type="date" value=project.date}}
-      Location: {{input value=project.location}}
+      Date: {{input type="date" value=recommendation.dateVoted}}
+      Location: {{input value=recommendation.voteLocation}}
     </div>
     <div class="project-summary-card callout">
       <h4>Do you want to submit one recommendation for all actions at once?</h4>
       <fieldset class="fieldset">
         <legend>Choose if you want to submit one recommendation for all actions at once:</legend>
-        <input type="radio" name="all-action-yes" id="all-action-yes" value="true"><label for="all-action-yes">Yes</label>
-        <input type="radio" name="all-action-no" id="all-action-no" value="false"><label for="all-action-no">No</label>
+        <input
+          type="radio"
+          name="all-action-yes"
+          id="all-action-yes"
+          checked={{if this.allActions "checked"}}
+          onClick={{action "setProp" "allActions" true}}
+        />
+        <label for="all-action-yes">
+          Yes
+        </label>
+        <input 
+          type="radio"
+          name="all-action-no"
+          id="all-action-no"
+          checked={{if (not this.allActions) "checked"}}
+          onClick={{action "setProp" "allActions" false}}
+        />
+        <label for="all-action-no">
+          No
+        </label>
       </fieldset>
       {{#unless this.allActions}}
-        <div class="grid-x">
-          <div class="cell large-3">
-            <ul class="menu vertical">
-              Approved
-              {{#each project.actions as |action|}}
-                <li>
-                  <a>
-                    {{filter-checkbox
-                      value=true
-                      currentValues=(array action.selected)
-                      classPrefix="borough"
-                    }}
-                  </a>
-                </li>
-              {{/each}}
-            </ul>
-          </div>
-          <div class="cell large-3">
-            <ul class="menu vertical">
-              Approved with Modifications
-              {{#each project.actions as |action|}}
-                <li>
-                  <a>
-                    {{filter-checkbox
-                      value=true
-                      currentValues=(array action.selected)
-                      classPrefix="borough"
-                    }}
-                  </a>
-                </li>
-              {{/each}}
-            </ul>
-          </div>
-          <div class="cell large-3">
-            <ul class="menu vertical">
-              Disapprove
-              {{#each project.actions as |action|}}
-                <li>
-                  <a>
-                    {{filter-checkbox
-                      value=true
-                      currentValues=(array action.selected)
-                      classPrefix="borough"
-                    }}
-                  </a>
-                </li>
-              {{/each}}
-            </ul>
-          </div>
-          <div class="cell large-3">
-            <ul class="menu vertical">
-              Disapprove with Modifications
-              {{#each project.actions as |action|}}
-                <li>
-                  <a>
-                    {{filter-checkbox
-                      value=true
-                      currentValues=(array action.selected)
-                      classPrefix="borough"
-                    }}
-                  </a>
-                </li>
-              {{/each}}
-            </ul>
-          </div>
-          {{!-- <div class="cell large-3">
-            <ul class="menu vertical">
-              Total
-              {{#each this.project.actions as |action|}}
-                <li>
-                  5 votes
-                </li>
-              {{/each}}
-            </ul>
-          </div> --}}
-        </div>
+          <table>
+            <thead>
+              <tr sty>
+                <th width="200">
+                    Recommendation Option
+                </th>
+                {{#each project.actions as |projAction|}}
+                  <th width="100">
+                    {{projAction.actionCode}}
+                  </th>
+                {{/each}}
+              </tr>
+            </thead>
+            <tbody>
+              {{#each-in this.recommendationOptions as |recOptionKey recOption|}}
+                <tr>
+                  <td width="200">
+                    {{recOption.label}}
+                  </td>
+                  {{#each project.actions as |projAction|}}
+                    <td width="100">
+                      <input
+                        type="radio"
+                        name={{concat (concat projAction "-") recOptionKey}}
+                        id={{concat (concat projAction "-") recOptionKey}}
+                        checked={{if (in-array (get recOption "actions") projAction) "checked"}}
+                        onClick={{action "addActionToOption" projAction recOptionKey}}
+                      />
+                    </td>
+                  {{/each}}
+                </tr>
+              {{/each-in}}
+            </tbody>
+          </table>
       {{/unless}}
     </div>
   {{/with}}
-
+   <LinkTo
+      @route="my-projects"
+      class="button expanded no-margin"
+    >
+    Submit&nbsp;Your<br>
+    <b>
+    {{#if (eq this.participantType "BP")}}
+      Borough&nbsp;President
+    {{else if (eq this.participantType "BB")}}
+      Borough&nbsp;Board
+    {{else if (eq this.participantType "CB")}}
+      Community&nbsp;Board
+    {{/if}}
+    </b>
+    Recommendation
+  </LinkTo>
   {{outlet}}
 {{/if}}

@@ -1,6 +1,14 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { A } from '@ember/array';
+import EmberObject from '@ember/object';
+
+const recommendationOption = EmberObject.extend({
+  label: '',
+  code: '',
+  actions: A(),
+});
 
 // Returns a new record of the same model as `recommendation`
 // and copies all existing attributes from `recommendation`.
@@ -34,10 +42,44 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   // if the new recommendation applies to all actions
   allActions = true;
 
-  approvedActions = [];
-  approvedModificationsActions = [];
-  disapprovedActions = [];
-  disapprovedModificationsActions = [];
+  recommendationOptions = {
+    'approved': recommendationOption.create({
+      label: 'Approved',
+      code: 'approved',
+    }),
+    'approved-with-modifications-conditions': recommendationOption.create({
+      label: 'Approved with Modifications/Conditions',
+      code: 'approved-with-modifications-conditions',
+    }),
+    'disapproved': recommendationOption.create({
+      label: 'Disapproved',
+      code: 'disapproved',
+    }),
+    'disapproved-with-modifications-conditions': recommendationOption.create({
+      label: 'Disapproved with Modifications/Conditions',
+      code: 'disapproved-with-modifications-conditions',
+    }),
+    'non-complying': recommendationOption.create({
+      label: 'Non-Complying',
+      code: 'non-complying',
+    }),
+    'vote-quorum-not-present': recommendationOption.create({
+      label: 'Vote Quorum Not Present',
+      code: 'vote-quorum-not-present',
+    }),
+    'received-after-clock-expired': recommendationOption.create({
+      label: 'Received after Clock Expired',
+      code: 'received-after-clock-expired',
+    }),
+    'no-objection': recommendationOption.create({
+      label: 'No Objection',
+      code: 'no-objection',
+    }),
+    'waiver-of-recommendation': recommendationOption.create({
+      label: 'Waiver of Recommendation',
+      code: 'waiver-of-recommendation',
+    }),
+  };
 
   /*
     `mutateArray` "toggles" a set of value(s) against an array, meaning they
@@ -45,27 +87,49 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     @param {string} key
     @param {number[]|string[]|object[]} values
   */
- @action
- mutateArray(key, ...values) {
-   // BEWARE: binding this to 'onClick=' will insert the mouseEvent
-   const targetArray = this.get(key);
+  @action
+  mutateArray(key, ...values) {
+    // BEWARE: binding this to 'onClick=' will insert the mouseEvent
+    const targetArray = this.get(key);
 
-   // ember handlebars can't use spread/rest syntax for actions yet
-   // so we check if array is passed
-   const unnestedValues = (isArray(values[0]) && values.length === 1) ? values[0] : values;
+    // ember handlebars can't use spread/rest syntax for actions yet
+    // so we check if array is passed
+    const unnestedValues = (isArray(values[0]) && values.length === 1) ? values[0] : values;
 
-   // Loop and remove or push based on whether they're present in the array.
-   unnestedValues.forEach((value) => {
-     if (targetArray.includes(value)) {
-       targetArray.removeObject(value);
-     } else {
-       targetArray.pushObject(value);
-     }
-   });
+    // Loop and remove or push based on whether they're present in the array.
+    unnestedValues.forEach((value) => {
+      if (targetArray.includes(value)) {
+        targetArray.removeObject(value);
+      } else {
+        targetArray.pushObject(value);
+      }
+    });
 
-   this.set(key, targetArray.sort());
- }
+    this.set(key, targetArray.sort());
+  }
 
+  @action
+  updateRecAttr(attrName, newVal) {
+    this.recommendation.set(attrName, newVal);
+  }
+
+  @action
+  setProp(property, newVal) {
+    this.set(property, newVal);
+  }
+
+  @action
+  addActionToOption(projAction, selectedOptionCode) {
+    for(let option of Object.keys(this.recommendationOptions)) {
+      this.recommendationOptions[option].actions.removeObject(projAction);
+      // this.recommendationOptions.notifyPropertyChange(option);
+      this.recommendationOptions[option].notifyPropertyChange('actions');
+      break;
+    };
+    this.recommendationOptions[selectedOptionCode].actions.addObject(projAction);
+    // this.recommendationOptions.notifyPropertyChange(selectedOptionCode);
+    this.recommendationOptions[selectedOptionCode].notifyPropertyChange('actions');
+  }
 
   @action
   submitRecommendation(recommendation) {
@@ -76,7 +140,6 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
       for (let recommendationType of [approvedActions, approvedModificationsActions,
         disapprovedActions, disapprovedModificationsActions]) {
-          console.log(recommendationType);
       }
 
       if (approvedActions) {
