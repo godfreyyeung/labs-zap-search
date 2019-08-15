@@ -118,13 +118,15 @@
                   </td>
                   {{#each project.actions as |projAction|}}
                     <td width="100">
-                      <input
-                        type="radio"
-                        name={{concat (concat projAction "-") recOptionKey}}
-                        id={{concat (concat projAction "-") recOptionKey}}
-                        checked={{if (in-array (get recOption "actions") projAction) "checked"}}
-                        onClick={{action "addActionToOption" projAction recOptionKey}}
-                      />
+                      {{#let (get recOption "actions") as |recActions|}}
+                        <input
+                          type="radio"
+                          name={{concat (concat projAction "-") recOptionKey}}
+                          id={{concat (concat projAction "-") recOptionKey}}
+                          checked={{if (in-array recActions projAction) "checked"}}
+                          onClick={{action "addActionToOption" projAction recOptionKey}}
+                        />
+                      {{/let}}
                     </td>
                   {{/each}}
                 </tr>

@@ -4,11 +4,11 @@ import { inject as service } from '@ember/service';
 import { A } from '@ember/array';
 import EmberObject from '@ember/object';
 
-const recommendationOption = EmberObject.extend({
-  label: '',
-  code: '',
-  actions: A(),
-});
+class RecommendationOption extends EmberObject {
+  label = '';
+  code = '';
+  actions = A();
+}
 
 // Returns a new record of the same model as `recommendation`
 // and copies all existing attributes from `recommendation`.
@@ -42,71 +42,44 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   // if the new recommendation applies to all actions
   allActions = true;
 
-  recommendationOptions = {
-    'approved': recommendationOption.create({
+  recommendationOptions = EmberObject.create({
+    'approved': RecommendationOption.create({
       label: 'Approved',
       code: 'approved',
     }),
-    'approved-with-modifications-conditions': recommendationOption.create({
+    'approved-with-modifications-conditions': RecommendationOption.create({
       label: 'Approved with Modifications/Conditions',
       code: 'approved-with-modifications-conditions',
     }),
-    'disapproved': recommendationOption.create({
+    'disapproved': RecommendationOption.create({
       label: 'Disapproved',
       code: 'disapproved',
     }),
-    'disapproved-with-modifications-conditions': recommendationOption.create({
+    'disapproved-with-modifications-conditions': RecommendationOption.create({
       label: 'Disapproved with Modifications/Conditions',
       code: 'disapproved-with-modifications-conditions',
     }),
-    'non-complying': recommendationOption.create({
+    'non-complying': RecommendationOption.create({
       label: 'Non-Complying',
       code: 'non-complying',
     }),
-    'vote-quorum-not-present': recommendationOption.create({
+    'vote-quorum-not-present': RecommendationOption.create({
       label: 'Vote Quorum Not Present',
       code: 'vote-quorum-not-present',
     }),
-    'received-after-clock-expired': recommendationOption.create({
+    'received-after-clock-expired': RecommendationOption.create({
       label: 'Received after Clock Expired',
       code: 'received-after-clock-expired',
     }),
-    'no-objection': recommendationOption.create({
+    'no-objection': RecommendationOption.create({
       label: 'No Objection',
       code: 'no-objection',
     }),
-    'waiver-of-recommendation': recommendationOption.create({
+    'waiver-of-recommendation': RecommendationOption.create({
       label: 'Waiver of Recommendation',
       code: 'waiver-of-recommendation',
     }),
-  };
-
-  /*
-    `mutateArray` "toggles" a set of value(s) against an array, meaning they
-    are either removed or added if they're present or absent, respectively.
-    @param {string} key
-    @param {number[]|string[]|object[]} values
-  */
-  @action
-  mutateArray(key, ...values) {
-    // BEWARE: binding this to 'onClick=' will insert the mouseEvent
-    const targetArray = this.get(key);
-
-    // ember handlebars can't use spread/rest syntax for actions yet
-    // so we check if array is passed
-    const unnestedValues = (isArray(values[0]) && values.length === 1) ? values[0] : values;
-
-    // Loop and remove or push based on whether they're present in the array.
-    unnestedValues.forEach((value) => {
-      if (targetArray.includes(value)) {
-        targetArray.removeObject(value);
-      } else {
-        targetArray.pushObject(value);
-      }
-    });
-
-    this.set(key, targetArray.sort());
-  }
+  });
 
   @action
   updateRecAttr(attrName, newVal) {
@@ -122,12 +95,9 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   addActionToOption(projAction, selectedOptionCode) {
     for(let option of Object.keys(this.recommendationOptions)) {
       this.recommendationOptions[option].actions.removeObject(projAction);
-      // this.recommendationOptions.notifyPropertyChange(option);
       this.recommendationOptions[option].notifyPropertyChange('actions');
-      break;
     };
     this.recommendationOptions[selectedOptionCode].actions.addObject(projAction);
-    // this.recommendationOptions.notifyPropertyChange(selectedOptionCode);
     this.recommendationOptions[selectedOptionCode].notifyPropertyChange('actions');
   }
 
