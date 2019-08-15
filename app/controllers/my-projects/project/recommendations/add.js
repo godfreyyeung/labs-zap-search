@@ -13,14 +13,17 @@ class RecommendationOption extends EmberObject {
 // Returns a new record of the same model as `recommendation`
 // and copies all existing attributes from `recommendation`.
 // It does not yet persist the new record.
-function cloneRecommendationRecord(recommendation) {
-  let recommendationCopy = this.store.createRecord(recommendation.constructor.modelName);
-
-  recommendation.fields.forEach((kind, field) => {
-    if(recommendation.get(field)){
-      recommendationCopy.set(field, recommendation.get(field));
-    }
+function cloneRecommendationRecord(recommendation, store) {
+  let recommendationCopy = store.createRecord(recommendation.constructor.modelName, {
+  ...(recommendation.toJSON())
   });
+
+  if (recommendation.user) {
+    recommendationCopy.set('user', recommendation.user);
+  }
+  if (recommendation.actions) {
+    recommendationCopy.set('actions', recommendation.actions);
+  }
 
   return recommendationCopy;
 }
@@ -82,56 +85,49 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   });
 
   @action
-  updateRecAttr(attrName, newVal) {
-    this.recommendation.set(attrName, newVal);
-  }
-
-  @action
   setProp(property, newVal) {
     this.set(property, newVal);
   }
 
   @action
+  updateRecAttr(attrName, newVal) {
+    this.recommendation.set(attrName, newVal);
+  }
+
+  @action
   addActionToOption(projAction, selectedOptionCode) {
-    for(let option of Object.keys(this.recommendationOptions)) {
-      this.recommendationOptions[option].actions.removeObject(projAction);
-      this.recommendationOptions[option].notifyPropertyChange('actions');
+    for(let optionCode of Object.keys(this.recommendationOptions)) {
+      this.recommendationOptions[optionCode].actions.removeObject(projAction);
+      this.recommendationOptions[optionCode].notifyPropertyChange('actions');
     };
     this.recommendationOptions[selectedOptionCode].actions.addObject(projAction);
     this.recommendationOptions[selectedOptionCode].notifyPropertyChange('actions');
   }
 
   @action
-  submitRecommendation(recommendation) {
-    if (allActions) {
-      recommendation.actions = this.model.project.actions;
-      recommendation.save();
+  submitRecommendation() {
+    let project = this.model;
+    let savePromise;
+    if (this.allActions) {
+      this.recommendation.set('actions', project.actions);
+      savePromise = this.recommendation.save();
     } else {
-
-      for (let recommendationType of [approvedActions, approvedModificationsActions,
-        disapprovedActions, disapprovedModificationsActions]) {
+      for (let optionCode of Object.keys(this.recommendationOptions)) {
+        let recommendationOption = this.recommendationOptions[optionCode];
+        if (recommendationOption.actions.length) {
+          let recommendationCopy = cloneRecommendationRecord(this.recommendation, this.store);
+          recommendationCopy.set('actions', recommendationOption.actions);
+          savePromise = recommendationCopy.save();
+        }
       }
-
-      if (approvedActions) {
-        let recommendationCopy = cloneRecommendationRecord();
-        recommendationCopy.actions = approvedActions;
-        recommendationCopy.save();
-      }
-      if (approvedModificationsActions) {
-        let recommendationCopy = cloneRecommendationRecord();
-        recommendationCopy.actions = approvedModificationsActions;
-        recommendationCopy.save();
-      }
-      if(disapprovedActions) {
-        let recommendationCopy = cloneRecommendationRecord();
-        recommendationCopy.actions = disapprovedActions;
-        recommendationCopy.save();
-      }
-      if(disapprovedModificationsActions) {
-        let recommendationCopy = cloneRecommendationRecord();
-        recommendationCopy.actions = disapprovedModificationsActions;
-        recommendationCopy.save();
-      }
+    }
+    if (savePromise) {
+      savePromise.then(() => {
+        // TODO: transition to my-projects.project.recommendation.view
+        this.transitionToRoute("my-projects.project");
+      }, () => {
+        this.set("error", "Oops, there was an error submitting your recommendation.");
+      });
     }
   }
 };

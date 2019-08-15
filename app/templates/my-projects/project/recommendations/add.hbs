@@ -136,9 +136,9 @@
       {{/unless}}
     </div>
   {{/with}}
-   <LinkTo
-      @route="my-projects"
+  <button
       class="button expanded no-margin"
+      onClick={{action "submitRecommendation"}}
     >
     Submit&nbsp;Your<br>
     <b>
@@ -151,6 +151,6 @@
     {{/if}}
     </b>
     Recommendation
-  </LinkTo>
+  </button>
   {{outlet}}
 {{/if}}
