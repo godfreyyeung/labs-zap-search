@@ -40,6 +40,7 @@ Router.map(function() { // eslint-disable-line
     }, function() {
       this.route('recommendations', function() {
         this.route('add');
+        this.route('view');
       });
     });
   });

@@ -124,7 +124,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     if (savePromise) {
       savePromise.then(() => {
         // TODO: transition to my-projects.project.recommendation.view
-        this.transitionToRoute("my-projects.project");
+        this.transitionToRoute("my-projects.project.recommendations.view", project);
       }, () => {
         this.set("error", "Oops, there was an error submitting your recommendation.");
       });
