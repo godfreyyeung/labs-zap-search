@@ -20,8 +20,10 @@
       </div>
       <div class="cell large-auto">
         <a class="button expanded no-margin">
-          Add Your<br>Hearing&nbsp;Date
+          Add <br>Hearing&nbsp;Date
         </a>
+      </div>
+      <div class="cell large-auto">
         {{#participant-types
           project=project
           user=(await this.currentUser.user)
@@ -33,7 +35,7 @@
               @query={{hash participantType=participantType}}
               class="button expanded no-margin"
             >
-              Submit&nbsp;Your<br>
+              Submit<br>
               <b>
               {{#if (eq participantType "BP")}}
                 Borough&nbsp;President
