@@ -2,9 +2,13 @@ import { Factory, faker } from 'ember-cli-mirage';
 import bblFeatureCollection from '../test-data/bbl-feature-collection';
 
 export default Factory.extend({
-  dcp_projectid() {
-    return faker.random.uuid();
-  },
+
+  // dcp_projectid was deleted from Project model
+  // Also, faker.random.uuid() seems broken:
+  // https://github.com/Marak/faker.js/issues/790
+  // id() {
+  //   return faker.random.uuid();
+  // },
 
   dcp_name() {
     return faker.random.number();
@@ -125,9 +129,7 @@ export default Factory.extend({
     return faker.random.word();
   },
 
-  dcp_communitydistricts() {
-    return faker.random.word();
-  },
+  dcp_communitydistricts: 'BX08;SI01;SI02;SI03',
 
   dcp_validatedcommunitydistricts() {
     return faker.random.word();
@@ -146,20 +148,6 @@ export default Factory.extend({
       '3026150002',
       '3026150019',
       '3026150050',
-    ];
-  },
-
-  actions() {
-    return [
-      {
-        dcp_name: 'Unknown Action',
-        actioncode: 'UK',
-        dcp_ulurpnumber: null,
-        dcp_prefix: null,
-        statuscode: 'Active',
-        dcp_ccresolutionnumber: null,
-        dcp_zoningresolution: null,
-      },
     ];
   },
 
@@ -225,5 +213,10 @@ export default Factory.extend({
         name: 'BURLINGTON COAT FACTORY OF TEXAS, INC.',
       },
     ];
+  },
+
+  afterCreate(project, server) {
+    server.createList('action', 3, { project });
+    server.create('hearing', {project});
   },
 });

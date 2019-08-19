@@ -1,5 +1,8 @@
 'use strict';
 
+// if this exists in the environment, use it instead of others
+const ENVIRONMENTAL_HOST_API = process.env.HOST_API;
+
 module.exports = function(environment) {
   const ENV = {
     modulePrefix: 'labs-zap-search',
@@ -10,10 +13,12 @@ module.exports = function(environment) {
     routerScroll: {
       scrollElement: '#scrolling-result-content',
     },
+    host: ENVIRONMENTAL_HOST_API || '',
+    OAUTH_ENDPOINT: 'https://accounts-nonprd.nyc.gov/account/api/oauth/authorize.htm?response_type=token&client_id=zap_staging',
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
-        // e.g. 'with-controller': true
+        // e.g. EMBER_NATIVE_DECORATOR_SUPPORT: true
       },
       EXTEND_PROTOTYPES: {
         // Prevent Ember Data from overriding Date.parse.
@@ -119,7 +124,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'devlocal') {
-    ENV.host = 'http://localhost:3000';
+    ENV.host = ENVIRONMENTAL_HOST_API || 'http://localhost:3000';
     ENV['mapbox-gl'].map.style = '/test-data/style.json';
     ENV['ember-cli-mirage'] = {
       enabled: false,
@@ -131,12 +136,12 @@ module.exports = function(environment) {
       enabled: false,
     };
 
-    ENV.host = 'https://zap-api.planninglabs.nyc';
+    ENV.host = ENVIRONMENTAL_HOST_API || 'https://zap-api.planninglabs.nyc';
     ENV['mapbox-gl'].map.style = 'https://layers-api.planninglabs.nyc/v1/base/style.json';
   }
 
   if (environment === 'staging') {
-    ENV.host = 'https://zap-api-staging.planninglabs.nyc';
+    ENV.host = ENVIRONMENTAL_HOST_API || 'https://zap-api-staging.planninglabs.nyc';
     ENV['mapbox-gl'].map.style = '/test-data/style.json';
     ENV['ember-cli-mirage'] = {
       enabled: false,
@@ -144,7 +149,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'devlive') {
-    ENV.host = 'https://zap-api.planninglabs.nyc';
+    ENV.host = ENVIRONMENTAL_HOST_API || 'https://zap-api.planninglabs.nyc';
 
     ENV['ember-cli-mirage'] = {
       enabled: false,

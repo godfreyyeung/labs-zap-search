@@ -24,13 +24,27 @@ const Router = EmberRouter.extend(RouterScroll, {
   rootURL: config.rootURL,
 });
 
-Router.map(function() {
+Router.map(function() { // eslint-disable-line
   this.route('show-project', { path: '/projects/:id' });
   this.route('show-geography', { path: '/projects' });
   this.route('disclaimer');
   this.route('not-found', { path: '/*path' });
   this.route('oops');
-  return null;
+  this.route('my-projects', function() {
+    this.route('to-review');
+    this.route('archive');
+    this.route('upcoming');
+    this.route('reviewed');
+    this.route('project', {
+      path: ':project_id'
+    }, function() {
+      this.route('recommendations', function() {
+        this.route('add');
+        this.route('view');
+      });
+    });
+  });
+  this.route('login');
 });
 
 export default Router;

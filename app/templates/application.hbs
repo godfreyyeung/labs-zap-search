@@ -1,4 +1,39 @@
-{{labs-site-header}}
+{{#labs-ui/site-header
+  responsiveNav=true
+  responsiveSize='large'
+  betaNotice=false
+  as |banner|
+}}
+  {{#banner.pre}}
+    <ul class="pre-nav">
+      <li>{{link-to 'Disclaimer' 'disclaimer'}}</li>
+      <li>
+        {{#tool-tipster
+          content='
+              <p>Please report data errors by using the “Report Data Issue” form on each particular project’s page.</p>
+              <p class="no-margin">For general feedback about this application, email <strong><a href="mailto:ZAP_Feedback_DL@planning.nyc.gov">ZAP_Feedback_DL@planning.nyc.gov</a></strong>.</p>
+            '
+          interactive=true
+          contentAsHTML=true
+          triggerEvent='click'
+          tagName='a'
+          side='bottom'
+        }}
+          {{fa-icon 'envelope'}} Feedback
+        {{/tool-tipster}}
+      </li>
+    </ul>
+  {{/banner.pre}}
+  {{#banner.title}}
+    {{#link-to 'show-geography' classNames='site-title'}}Zoning Application Portal{{/link-to}}
+  {{/banner.title}}
+  {{#banner.nav}}
+    <ul class="menu vertical large-horizontal">
+      <li>{{link-to 'Search' 'show-geography'}}</li>
+      {{sign-in}}
+    </ul>
+  {{/banner.nav}}
+{{/labs-ui/site-header}}
 
 <div class="site-main grid-x grid-padding-x route-{{currentRouteName}}">
   {{outlet}}

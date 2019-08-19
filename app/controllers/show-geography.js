@@ -1,4 +1,4 @@
-import { action, computed } from '@ember-decorators/object';
+import { action, computed } from '@ember/object';
 import { restartableTask, keepLatestTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
 import { isArray } from '@ember/array';
@@ -19,16 +19,6 @@ const MAX_PAGES = 30;
  * computed properties that help manage things like page numbers.
  */
 export default class ShowGeographyController extends GeographyParachuteController {
-  /**
-   * This method is an Ember lifecycle hook, gets fired on initialization of the controller.
-   * This fetches data as soon as the controller gets instantiated.
-   */
-  init(...args) {
-    super.init(...args);
-
-    this.fetchData.perform({ unloadAll: true });
-  }
-
   /**
    * Current page number used to paginate the results
    */

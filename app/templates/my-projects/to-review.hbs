@@ -1,0 +1,57 @@
+<h5>Projects that require you to submit your hearing dates and recommendations</h5>
+{{#each this.model as |project|}}
+  <div class="project-summary-card callout">
+    <div class="grid-x">
+      <div class="cell large-6">
+        <h3 class="tiny-margin-bottom">
+          <a>{{project.dcp_projectname}}</a>
+          <small class="dark-gray">{{project.ulurp_nonulurp}}</small>
+        </h3>
+        <h5 class="applicant">{{project.applicants}}.</h5>
+        <p class="no-margin">{{project.dcp_projectbrief}}.</p>
+      </div>
+      <div class="cell large-shrink">
+        <div class="lup-countdown">
+          <p class="cert-date">Certified 11/1/2018</p>
+          <p class="days">8</p>
+          <p class="total">of 60 days remain</p>
+          <p class="end-date">Ends 12/15/19</p>
+        </div>
+      </div>
+      <div class="cell large-auto">
+        <a class="button expanded no-margin">
+          Add <br>Hearing&nbsp;Date
+        </a>
+      </div>
+      <div class="cell large-auto">
+        {{#participant-types
+          project=project
+          user=(await this.currentUser.user)
+          as |partTypes|
+        }}
+          {{#each partTypes as |participantType|}}
+            <LinkTo @route="my-projects.project.recommendations.add"
+              @model={{project}}
+              @query={{hash participantType=participantType}}
+              class="button expanded no-margin"
+            >
+              Submit<br>
+              <b>
+              {{#if (eq participantType "BP")}}
+                Borough&nbsp;President
+              {{else if (eq participantType "BB")}}
+                Borough&nbsp;Board
+              {{else if (eq participantType "CB")}}
+                Community&nbsp;Board
+              {{/if}}
+              </b>
+              Recommendation
+            </LinkTo>
+          {{/each}}
+        {{/participant-types}}
+      </div>
+    </div>
+  </div>
+{{/each}}
+
+{{outlet}}

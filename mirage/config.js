@@ -35,6 +35,43 @@ export default function() {
     return schema.projects.find(request.params.id) || schema.projects.find(1);
   });
 
+  this.get('/users', function(schema, request) {
+    const { id } = request.params;
+    const { me } = request.queryParams;
+
+    // check that this is a request for an auth'd user and there's a cookie
+    if (me && document.cookie.includes('token')) return schema.users.first();
+
+    return schema.users.find(id); // users in the second case
+  });
+  this.get('/users/:id');
+
+  this.get('/actions');
+  this.get('/actions/:id');
+
+  this.get('/recommendations', function(schema, request) {
+    const cbRecs = schema.communityBoardRecommendations.all();
+    const bbRecs = schema.boroughBoardRecommendations.all();
+    const bpRecs = schema.boroughPresidentRecommendations.all();
+    return {
+      data: [...cbRecs.models, ...bbRecs.models, ...bpRecs.models]
+    };
+  });
+
+  this.get('/borough-president-recommendations');
+  this.get('/community-board-recommendations');
+  this.get('/borough-board-recommendations');
+
+  this.post('/borough-president-recommendations');
+  this.post('/community-board-recommendations');
+  this.post('/borough-board-recommendations');
+
+  this.get('/login', function() {
+    document.cookie = 'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250YWN0SWQiOiIyYTIzMWQxNC02OTNlLWU4MTEtODEzMy0xNDU4ZDA0ZDA2YzAiLCJpYXQiOjExMTExMTExMX0.1G_sYrMbZ1EWoZxz75sTUejv-hjqyHLjq7OM253RHes;';
+
+    return {};
+  });
+
   /*
     Config (with defaults).
 
