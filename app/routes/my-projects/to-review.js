@@ -34,12 +34,17 @@ export default class MyProjectsToReviewRoute extends Route {
   @service
   store;
 
+  // This route loads the user's projects according to their milestones and associated userProjectParticipantTypes.
+  // Specifically, a given user's project only shows up here if it has an active "Review" (a.k.a. "Referral") milestone
+  // that matches one of the project's -- and the current user's -- associated userProjectParticipantTypes.
+  // For example, for a Borough President user, a project shows up here if it has an active Borough President Referral milestone.
   async model() {
     // TODO: Retrieve projects here, instead of side-loading in currentUser service.
     const user = await this.currentUser.get('user');
     let userProjects = user.projects.filter((project) => {
       let includeProject = false;
       let userProjPartTypes = userProjectParticipantTypes(user, project);
+      // TODO: refactor away from forEach();
       project.milestones.forEach((milestone) => {
         if((milestone.statusCode === 'In Progress')){
           userProjPartTypes.forEach((partType) => {
@@ -47,7 +52,7 @@ export default class MyProjectsToReviewRoute extends Route {
             if ((milestone.milestoneId === partTypeMilestoneId)) {
               includeProject = true;
             }
-          }); 
+          });
         }
       });
       return includeProject;
