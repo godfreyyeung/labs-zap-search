@@ -12,6 +12,8 @@ const MILESTONE_ID_LOOKUP = {
   'BB': BOROUGH_BOARD_REFERRAL_MILESTONE_ID,
 }
 
+const TO_REVIEW_MILESTONE_STATUSCODE = 'In Progress';
+
 /**
  * 
  * @param {User Model Instance} user - must have userProjectParticipantTypes side-loaded
@@ -46,7 +48,7 @@ export default class MyProjectsToReviewRoute extends Route {
       let userProjPartTypes = userProjectParticipantTypes(user, project);
       // TODO: refactor away from forEach();
       project.milestones.forEach((milestone) => {
-        if((milestone.statusCode === 'In Progress')){
+        if((milestone.statusCode === TO_REVIEW_MILESTONE_STATUSCODE)){
           userProjPartTypes.forEach((partType) => {
             let partTypeMilestoneId = MILESTONE_ID_LOOKUP[partType];
             if ((milestone.milestoneId === partTypeMilestoneId)) {
