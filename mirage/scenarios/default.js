@@ -68,7 +68,7 @@ export default function(server) {
     participantType: 'BB',
   });
 
-    /** Milestones **/
+  /** Milestones **/
   // For a CB participantType.... 
   // - Projects in the "Upcoming" bin to milestone
   server.create('milestone' , {
