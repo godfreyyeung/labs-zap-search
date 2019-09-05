@@ -1,4 +1,19 @@
 import patchXMLHTTPRequest from './helpers/mirage-mapbox-gl-monkeypatch';
+import userProjectParticipantTypes from './helpers/user-project-participant-types';
+
+const COMMUNITY_BOARD_REFERRAL_MILESTONE_ID   = "923BEEC4-DAD0-E711-8116-1458D04E2FB8";
+const BOROUGH_PRESIDENT_REFERRAL_MILESTONE_ID = "963BEEC4-DAD0-E711-8116-1458D04E2FB8";
+const BOROUGH_BOARD_REFERRAL_MILESTONE_ID     = "943BEEC4-DAD0-E711-8116-1458D04E2FB8";
+
+const MILESTONE_ID_LOOKUP = {
+  'CB': COMMUNITY_BOARD_REFERRAL_MILESTONE_ID, 
+  'BP': BOROUGH_PRESIDENT_REFERRAL_MILESTONE_ID, 
+  'BB': BOROUGH_BOARD_REFERRAL_MILESTONE_ID,
+}
+
+const UPCOMING_MILESTONE_STATUSCODE = 'Not Started';
+const TO_REVIEW_MILESTONE_STATUSCODE = 'In Progress';
+const REVIEWED_MILESTONE_STATUSCODE = 'Completed';
 
 export default function() {
   patchXMLHTTPRequest();
@@ -50,12 +65,11 @@ export default function() {
   this.get('/actions/:id');
 
   this.get('/recommendations', function(schema) {
-    const cbRecs = schema.communityBoardRecommendations.all();
-    const bbRecs = schema.boroughBoardRecommendations.all();
-    const bpRecs = schema.boroughPresidentRecommendations.all();
-    return {
-      data: [...cbRecs.models, ...bbRecs.models, ...bpRecs.models],
-    };
+    const recommendations = schema.communityBoardRecommendations.all();
+    recommendations.push(schema.boroughBoardRecommendations.all());
+    recommendations.push(schema.boroughPresidentRecommendations.all());
+    recommendations.modelName = 'recommendation';
+    return recommendations;
   });
 
   this.get('/borough-president-recommendations');
@@ -78,6 +92,51 @@ export default function() {
   this.patch('/hearings/:id');
   this.post('/hearings');
 
+
+  // Mock the project tab endpoints
+  // TODO: Update this to match backend endpt when it is finalized
+  this.get('/users/:user_id/projects', async function(schema, request) {
+    let userId = request.params.user_id;
+    let projectState = request.queryParams.projectState;
+    let user;
+
+    if (document.cookie.includes('token')) {
+      let milestoneStatusCode = null;
+      if (projectState === 'upcoming') {
+        milestoneStatusCode = UPCOMING_MILESTONE_STATUSCODE;
+      }
+      if (projectState === 'to-review') {
+        milestoneStatusCode = TO_REVIEW_MILESTONE_STATUSCODE;
+      }
+      if (projectState === 'reviewed') {
+        milestoneStatusCode = REVIEWED_MILESTONE_STATUSCODE;
+      }
+
+      user = await schema.users.find(userId);
+      let userProjects = user.projects.filter((project) => {
+        let includeProject = false;
+        let userProjPartTypes = userProjectParticipantTypes(user, project);
+        for(let i = 0; i < project.milestones.models.length; i++){
+          let milestone = project.milestones.models[i];
+          if (milestone.statusCode === milestoneStatusCode) {
+            for(let j = 0; j < userProjPartTypes.length; j++){
+              let userProjPartType = userProjPartTypes[j];
+              let partTypeMilestoneId = MILESTONE_ID_LOOKUP[userProjPartType];
+              if ((milestone.milestoneId === partTypeMilestoneId)) {
+                includeProject = true;
+              }
+            }
+          }
+        }
+        return includeProject;
+      });
+      return userProjects.models.map((projectModel) => {
+        return projectModel.attrs.id;
+      });
+    }
+
+    return false;
+  });
   /*
     Config (with defaults).
 
