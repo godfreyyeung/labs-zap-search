@@ -10,61 +10,97 @@
     </div>
   </div>
 {{else}}
-  {{#with this.model as |project|}}
-
-  {{!-- TODO: Display recommendation based on user role (participantType),
-  which is based on milestone  --}}
-
-    <h2>Add Community Board Recommendation</h2>
-    <div class="grid-x grid-margin-x">
-      <div class="large-5 cell large-order-2">
-        <p>Recommendation to be submitted for:</p>
-        <div class="project-summary-card callout">
-          <h3 class="tiny-margin-bottom">
-            <LinkTo
-              @route="show-project"
-              @model={{project}}
-            >
-              {{project.dcp_projectname}}
-            </LinkTo>
-            <small class="dark-gray">{{project.ulurp_nonulurp}}</small>
-          </h3>
-          <h5 class="applicant">{{project.applicants}}</h5>
-          <p>{{project.dcp_projectbrief}}</p>
-        </div>
-      </div>
-      <div class="large-7 cell">
-
-        {{#if (eq this.participantType "CB")}}
-          <fieldset class="medium-margin-bottom">
-            <legend><strong>Was a Quorum Present at your hearing?</strong></legend>
-              <p class="text-small dark-gray">
-                Hearing occurred
-                on 11/3/2020
-                at 6:30 pm
-              </p>
-            <input type="radio"
-              name="quorum-yes"
-              id="quorum-yes"
-              checked="checked"
-            />
-            <label for="quorum-yes">
-              Yes
-            </label>
-            <input type="radio"
-              name="quorum-no"
-              id="quorum-no"
-              checked="checked"
-            />
-            <label for="quorum-no">
-              No
-            </label>
-          </fieldset>
+ <div class="large-7 cell">
+  {{#if this.dispositions.firstObject.publichearinglocation}}
+    <fieldset class="medium-margin-bottom">
+      <legend><strong>Was a Quorum Present at your hearing?</strong></legend>
+      <p class="help-text">
+        A quorum requires the presence of 20% of appointed board members, and not fewer than seven members.
+      </p>
+      {{#each this.dispositions as |disposition|}}
+        {{#if disposition.dateofpublichearing}}
+          <p class="text-small dark-gray">
+            Hearing occurred
+            on {{moment-format disposition.dateofpublichearing "MM/D/YYYY"}}
+            at {{disposition.publichearinglocation}}
+          </p>
         {{/if}}
-      </div>
-    </div>
-
-  {{/with}}
-
+        <input type="radio"
+          name={{concat idx '-quorum'}}
+          id={{concat idx '-quorum-yes'}}
+          checked={{if disposition.wasaquorumpresent "checked"}}
+          onClick={{action 'updateDispositionAttr' disposition 'wasaquorumpresent' true}}
+        />
+        <label
+          for="{{concat idx '-quorum-yes'}}"
+          {{action 'updateDispositionAttr' disposition 'wasaquorumpresent' true}}
+        >
+          Yes
+        </label>
+        <input type="radio"
+          name={{concat idx '-quorum'}}
+          id={{concat idx '-quorum-no'}}
+          checked={{if (eq disposition.wasaquorumpresent false) "checked"}}
+          onClick={{action 'updateDispositionAttr' disposition 'wasaquorumpresent' false}}
+        />
+        <label
+          for="{{concat idx '-quorum-no'}}"
+          {{action 'updateDispositionAttr' disposition 'wasaquorumpresent' false}}
+        >
+          No
+        </label>
+      {{/each}}
+    </fieldset>
+  {{/if}}
+{{!-- 
+  {{#if (gt this.dispositions.length 1)}}
+    <fieldset class="medium-margin-bottom">
+      <legend><strong>Would you like to submit a single recommendation for all actions?</strong></legend>
+      <input
+        type="radio"
+        name="all-action-yes"
+        id="all-action-yes"
+        checked={{if this.submitOneRec "checked"}}
+        onClick={{action "setProp" "submitOneRec" true}}
+      />
+      <label for="all-action-yes">
+        Yes
+      </label>
+      <input
+        type="radio"
+        name="all-action-no"
+        id="all-action-no"
+        checked={{if (not this.submitOneRec) "checked"}}
+        onClick={{action "setProp" "submitOneRec" false}}
+      />
+      <label for="all-action-no">
+        No, I will submit a recommendation for each action
+      </label>
+    </fieldset>
+  {{/if}}
+  {{#if this.submitOneRec}}
+    {{!-- One recommendation for all actions --}}
+    {{!-- <RecommendationForm
+      @actions={{this.actions}}
+      @recOptions={{recommendationOptions}}
+      @participantType={{this.participantType}}
+      recommendation={{}}
+    /> --}}
+    {{!-- <fieldset class="medium-margin-bottom vote-fieldset">
+      <legend><strong>Recommendation for all actions</strong></legend>
+      {{#power-select
+        searchEnabled=false
+        options=this.recommendationOptions
+        placeholder="select a recommendation"
+        onchange=(action (mut this.allActionsRecommendation))
+        as |recOption|
+      }}
+        {{recOption.label}}
+      {{/power-select}}
+    </fieldset>
+  {{else}} --}}
+    {{!-- Submit different rec for each action
+  {{/if}} --}}
+ </div>
 {{outlet}}
 {{/if}}

@@ -28,8 +28,12 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   // the participant-type-dependent Recommendation is set up within the router's
   // setupController.
 
-  // if the new recommendation applies to all actions
-  allActions = true;
+  // if user wishes to apply the same recommendation values to all dispositions
+  submitOneRec = true;
+
+  // the selected recommendation option if applying filled Recommendation
+  // to all actions/hearings
+  recommendationForAllActions = '';
 
   // the selected recommendation option if applying filled Recommendation
   // to all actions
@@ -57,6 +61,11 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
       code: 'not-available',
     }),
   });
+
+  @computed('recommendationOptions')
+  get recOptions() {
+    return ['hi', 'bye'];
+  }
 
   @computed('recommendationOptions.{approved.actions.[],["approved-with-modifications-conditions"].actions.[],disapproved.actions.[],["disapproved-with-modifications-conditions"].actions.[],["not-available"].actions.[]}')
   get allOptionsActions() {

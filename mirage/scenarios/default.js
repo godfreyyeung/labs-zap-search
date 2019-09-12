@@ -67,7 +67,8 @@ export default function(server) {
     participantType: 'BB',
   });
 
-  for (let i = 0; i < seedCBUserProjects[0].actions.length; i += 1) {
+
+  for (let i = 0; i < seedCBUserProjects[0].actions.models.length; i += 1) {
     server.create('disposition', {
       user: seedCBUser,
       project: seedCBUserProjects[0],
