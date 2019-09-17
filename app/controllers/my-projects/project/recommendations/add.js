@@ -14,12 +14,16 @@ class DispositionForAllActions extends EmberObject {
   // to all actions
   recommendation = '';
 
+  // --> DispositionModel.votinginfavorrecommendation
   votesInFavor = 0;
 
+  // --> DispositionModel.votingagainstrecommendation
   votesAgainst = 0;
 
+  // --> DispositionModel.votingabstainingonrecommendation
   votesAbstain = 0;
 
+  // --> DispositionModel.totalmembersappointedtotheboard
   votesTotalMembers = 0;
 
   voteLocation = '';
@@ -72,9 +76,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   @computed('recommendationOptions')
   get recOptions() {
-    return Object.keys(this.recommendationOptions).map((key) => {
-      return this.recommendationOptions[key].label;
-    });
+    return Object.keys(this.recommendationOptions).map(key => this.recommendationOptions[key].label);
   }
 
   @action
@@ -82,9 +84,36 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     this.set(property, newVal);
   }
 
+  // For setting disposition recommendation, use the action
+  // "setDispositionRecByPartType" instead.
   @action
   updateDispositionAttr(disposition, attrName, newVal) {
     disposition.set(attrName, newVal);
+  }
+
+  /**
+ * @param { Disposition } disposition
+ * @param { String } recommendation
+ * @param { String } participantType (optional)
+ * assigns the `recommendation` string to either the `
+ * TODO: Update this to rely on the disposition.participantType field
+ * when it is implemented in the ZAP-API.
+ */
+  @action
+  setDispositionRecByPartType (disposition, recommendation) {
+    const partType = this.participantType;
+    let recommendationFieldName = '';
+    if (partType === 'CB') {
+      recommendationFieldName = 'communityboardrecommendation';
+    } else if (partType === 'BB') {
+      recommendationFieldName = 'boroughboardrecommendation';
+    } else if (partType === 'BP') {
+      recommendationFieldName = 'boroughpresidentrecommendation';
+    } else {
+      return false;
+    }
+    disposition.set(recommendationFieldName, recommendation);
+    return true;
   }
 
   @action
@@ -94,8 +123,5 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   @action
   submitRecommendations() {
-    // TODO:When disposition.participantType is available from ZAP-API,
-    // use disposition.participantType to determine which 
-    // <participantType>recommendation field to write the recommendation to. 
   }
 }
