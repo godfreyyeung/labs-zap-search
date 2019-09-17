@@ -68,14 +68,28 @@ export default function(server) {
   });
 
 
-  for (let i = 0; i < seedCBUserProjects[0].actions.models.length; i += 1) {
-    server.create('disposition', {
-      user: seedCBUser,
-      project: seedCBUserProjects[0],
-      action: seedCBUserProjects[0].actions.models[i],
-      publichearinglocation: 'Canal street',
-      dateofpublichearing: '2018-11-02T01:21:46',
-    });
+  for (let i = 0; i < NUM_CB_USER_PROJECTS; i += 1) {
+    for (let j = 0; j < seedCBUserProjects[i].actions.models.length; j += 1) {
+      server.create('disposition', {
+        user: seedCBUser,
+        project: seedCBUserProjects[i],
+        action: seedCBUserProjects[i].actions.models[j],
+        publichearinglocation: 'Canal street',
+        dateofpublichearing: '2018-11-02T01:21:46',
+      });
+    }
+  }
+
+  for (let i = 0; i < NUM_BP_USER_PROJECTS; i += 1) {
+    for (let j = 0; j < seedBPUserProjects[i].actions.models.length; j += 1) {
+      server.create('disposition', {
+        user: seedCBUser,
+        project: seedBPUserProjects[i],
+        action: seedBPUserProjects[i].actions.models[j],
+        publichearinglocation: 'Canal street',
+        dateofpublichearing: '2018-11-02T01:21:46',
+      });
+    }
   }
 
   /*  Milestones  */

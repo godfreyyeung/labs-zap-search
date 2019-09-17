@@ -2,14 +2,31 @@ import Controller from '@ember/controller';
 import EmberObject, { action, computed } from '@ember/object';
 import { alias } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { A } from '@ember/array';
 
 class RecommendationOption extends EmberObject {
   label = '';
 
   code = '';
+}
 
-  actions = A();
+class DispositionForAllActions extends EmberObject {
+  // the selected recommendation option if applying filled Recommendation
+  // to all actions
+  recommendation = '';
+
+  votesInFavor = 0;
+
+  votesAgainst = 0;
+
+  votesAbstain = 0;
+
+  votesTotalMembers = 0;
+
+  voteLocation = '';
+
+  voteDate = '';
+
+  comment = '';
 }
 
 export default class MyProjectsProjectRecommendationsAddController extends Controller {
@@ -25,19 +42,10 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   @alias('model')
   project;
 
-  // the participant-type-dependent Recommendation is set up within the router's
-  // setupController.
-
   // if user wishes to apply the same recommendation values to all dispositions
-  submitOneRec = true;
+  submitOneRec = undefined;
 
-  // the selected recommendation option if applying filled Recommendation
-  // to all actions/hearings
-  recommendationForAllActions = '';
-
-  // the selected recommendation option if applying filled Recommendation
-  // to all actions
-  allActionsRecommendation = '';
+  dispositionForAllActions = DispositionForAllActions.create();
 
   recommendationOptions = EmberObject.create({
     approved: RecommendationOption.create({
@@ -64,19 +72,9 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   @computed('recommendationOptions')
   get recOptions() {
-    return ['hi', 'bye'];
-  }
-
-  @computed('recommendationOptions.{approved.actions.[],["approved-with-modifications-conditions"].actions.[],disapproved.actions.[],["disapproved-with-modifications-conditions"].actions.[],["not-available"].actions.[]}')
-  get allOptionsActions() {
-    const allActions = [
-      ...this.recommendationOptions.approved.actions,
-      ...this.recommendationOptions.get('approved-with-modifications-conditions').actions,
-      ...this.recommendationOptions.disapproved.actions,
-      ...this.recommendationOptions.get('disapproved-with-modifications-conditions').actions,
-      ...this.recommendationOptions.get('not-available').actions,
-    ];
-    return allActions;
+    return Object.keys(this.recommendationOptions).map((key) => {
+      return this.recommendationOptions[key].label;
+    });
   }
 
   @action
@@ -87,5 +85,17 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   @action
   updateDispositionAttr(disposition, attrName, newVal) {
     disposition.set(attrName, newVal);
+  }
+
+  @action
+  setHearingDate() {
+    return true;
+  }
+
+  @action
+  submitRecommendations() {
+    // TODO:When disposition.participantType is available from ZAP-API,
+    // use disposition.participantType to determine which 
+    // <participantType>recommendation field to write the recommendation to. 
   }
 }
