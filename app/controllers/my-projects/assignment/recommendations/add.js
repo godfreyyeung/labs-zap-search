@@ -101,16 +101,26 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   minDate = MINIMUM_VOTE_DATE;
 
-  // currently only used to name the universal queue
-  queueName = 'recommendation';
-
   isSubmitting = false;
 
   submitError = false;
 
-  @computed('fileQueue', 'queueName')
-  get recommendationQueue() {
-    return this.fileQueue.find(this.queueName) || this.fileQueue.create(this.queueName);
+  // This is the assignment-specific file queue.
+  // It holds all files related to this assignment, across all dispositions queues.
+  // This queue is different from the universal (global to app)
+  // and disposition-specific queues.
+  // Currently it's only used to list files next to the "upload" button and in the
+  // confirmation modal.
+  // TODO: Use a computed property to list files across all queues
+  @computed('assignment')
+  get assignmentQueueName() {
+    const parsedAssignmentId = this.assignment.id.replace(/-/g, '');
+    return `assign${parsedAssignmentId}`;
+  }
+
+  @computed('fileQueue', 'assignmentQueueName')
+  get assignmentQueue() {
+    return this.fileQueue.find(this.assignmentQueueName) || this.fileQueue.create(this.assignmentQueueName);
   }
 
   // Returns an object with an entry for each disposition and its corresponding file queue.
@@ -118,7 +128,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   @computed('fileQueue', 'dispositions')
   get queuesByDisposition() {
     return this.dispositions.reduce((queuesByDisposition, disposition) => {
-      queuesByDisposition[disposition.id] = this.fileQueue.create(disposition.id);
+      queuesByDisposition[disposition.id] = this.fileQueue.find(disposition.id) || this.fileQueue.create(disposition.id);
       return queuesByDisposition;
     }, {});
   }
@@ -303,6 +313,8 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     // array of true/false values each representing succesful upload of files to a disposition
     const uploadResults = [];
 
+    const assignmentQueueOriginalLength = this.assignmentQueue.files.length;
+
     try {
       for (let i = 0; i < this.dispositions.length; i += 1) {
         const disposition = this.dispositions.objectAt(i);
@@ -327,6 +339,10 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
           uploadResults.push(filesUploadedToDispo);
         }
       }
+
+      while (this.assignmentQueue.files.length > 0) {
+        this.assignmentQueue.remove(this.assignmentQueue.files[0]);
+      }
     } catch (e) {
       this.set('submitError', true);
       this.set('isSubmitting', false);
@@ -334,7 +350,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     }
 
     // Only proceed if all files were uploaded to all dispositions
-    if (uploadResults.every(res => res === true) && (uploadResults.length === this.dispositions.length * this.recommendationQueue.files.length) && !this.submitError) {
+    if (uploadResults.every(res => res === true) && (uploadResults.length === this.dispositions.length * assignmentQueueOriginalLength) && !this.submitError) {
       const { participantType } = this;
       const targetField = RECOMMENDATION_FIELD_BY_PARTICIPANT_TYPE_LOOKUP[participantType];
       this.dispositionForAllActionsChangeset.execute();
