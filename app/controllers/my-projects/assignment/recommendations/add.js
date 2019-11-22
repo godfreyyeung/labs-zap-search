@@ -110,7 +110,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   @computed('fileQueue', 'queueName')
   get recommendationQueue() {
-    return this.fileQueue.find(this.queueName);
+    return this.fileQueue.find(this.queueName) || this.fileQueue.create(this.queueName);
   }
 
   // Returns an object with an entry for each disposition and its corresponding file queue.
