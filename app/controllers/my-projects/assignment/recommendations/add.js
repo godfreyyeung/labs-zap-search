@@ -108,6 +108,11 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   submitError = false;
 
+  @computed('fileQueue', 'queueName')
+  get recommendationQueue() {
+    return this.fileQueue.find(this.queueName);
+  }
+
   // Returns an object with an entry for each disposition and its corresponding file queue.
   // Keys are the disposition id, values are the disposition's file queue.
   @computed('fileQueue', 'dispositions')
@@ -315,9 +320,12 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
         // next call of upload() on that file.
         const fileUploadResponses = await Promise.all(fileUploadPromises); // eslint-disable-line
 
-        const filesUploadedToDispo = fileUploadResponses.every(res => res.status === 200);
+        // if no files were uploaded, uploadResults.length needs to stay 0
+        if (fileUploadResponses.length > 0) {
+          const filesUploadedToDispo = fileUploadResponses.every(res => res.status === 200);
 
-        uploadResults.push(filesUploadedToDispo);
+          uploadResults.push(filesUploadedToDispo);
+        }
       }
     } catch (e) {
       this.set('submitError', true);
@@ -326,7 +334,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     }
 
     // Only proceed if all files were uploaded to all dispositions
-    if (uploadResults.every(res => res === true) && !this.submitError) {
+    if (uploadResults.every(res => res === true) && (uploadResults.length === this.dispositions.length * this.recommendationQueue.files.length) && !this.submitError) {
       const { participantType } = this;
       const targetField = RECOMMENDATION_FIELD_BY_PARTICIPANT_TYPE_LOOKUP[participantType];
       this.dispositionForAllActionsChangeset.execute();
