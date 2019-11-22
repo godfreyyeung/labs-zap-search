@@ -125,6 +125,7 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
 
   // Returns an object with an entry for each disposition and its corresponding file queue.
   // Keys are the disposition id, values are the disposition's file queue.
+  // A disposition file queue contains files that will be uploaded to that disposition.
   @computed('fileQueue', 'dispositions')
   get queuesByDisposition() {
     return this.dispositions.reduce((queuesByDisposition, disposition) => {
@@ -310,12 +311,19 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
   async submitRecommendations() {
     this.set('isSubmitting', true);
 
-    // array of true/false values each representing succesful upload of files to a disposition
+    // array of true/false values each representing whether a disposition
+    // had files successfully uploaded to it
     const uploadResults = [];
 
     const assignmentQueueOriginalLength = this.assignmentQueue.files.length;
 
     try {
+      // copy files from assignmentQueue to each disposition queue
+      for (let i = 0; i < this.assignmentQueue.files.length; i += 1) {
+        await this.addFileToDispositionQueues(this.assignmentQueue.files[i]); // eslint-disable-line
+      }
+
+      // upload files across dispositions queues
       for (let i = 0; i < this.dispositions.length; i += 1) {
         const disposition = this.dispositions.objectAt(i);
 
@@ -332,12 +340,10 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
         // next call of upload() on that file.
         const fileUploadResponses = await Promise.all(fileUploadPromises); // eslint-disable-line
 
-        // if no files were uploaded, uploadResults.length needs to stay 0
-        if (fileUploadResponses.length > 0) {
-          const filesUploadedToDispo = fileUploadResponses.every(res => res.status === 200);
+        // The check for matching fileUploadResponse length and assignmentQueueOriginalLength supports acceptance tests
+        const filesUploadedToDispo = fileUploadResponses.every(res => res.status === 200) && fileUploadResponses.length === assignmentQueueOriginalLength;
 
-          uploadResults.push(filesUploadedToDispo);
-        }
+        uploadResults.push(filesUploadedToDispo);
       }
 
       while (this.assignmentQueue.files.length > 0) {
@@ -350,7 +356,8 @@ export default class MyProjectsProjectRecommendationsAddController extends Contr
     }
 
     // Only proceed if all files were uploaded to all dispositions
-    if (uploadResults.every(res => res === true) && (uploadResults.length === this.dispositions.length * assignmentQueueOriginalLength) && !this.submitError) {
+    // The check for matching uploadResults and dispositions length supports acceptance tests
+    if (uploadResults.every(res => res === true) && (uploadResults.length === this.dispositions.length) && !this.submitError) {
       const { participantType } = this;
       const targetField = RECOMMENDATION_FIELD_BY_PARTICIPANT_TYPE_LOOKUP[participantType];
       this.dispositionForAllActionsChangeset.execute();
